@@ -11,8 +11,8 @@ fastify.register(cors, {
 });
 
 fastify.get('/countdown', async (req, reply) => {
-  const encoder = new GIFEncoder(400, 150); // Increased height for additional text
-  const canvas = createCanvas(400, 150);
+  const encoder = new GIFEncoder(400, 75); // Dimensions augmentées
+  const canvas = createCanvas(400, 75);
   const ctx = canvas.getContext('2d');
 
   encoder.start();
@@ -23,7 +23,7 @@ fastify.get('/countdown', async (req, reply) => {
   reply.header('Content-Type', 'image/gif').send(encoder.createReadStream());
 
   let endTime = new Date();
-  endTime.setSeconds(endTime.getSeconds() + 60); // 60 seconds from now
+  endTime.setSeconds(endTime.getSeconds() + 60); // 60 secondes à partir de maintenant
 
   for (let i = 0; i < 60; i++) {
     const simulatedTime = new Date(endTime.getTime() - i * 1000);
@@ -36,14 +36,20 @@ fastify.get('/countdown', async (req, reply) => {
     const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
 
     ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, 400, 150);
-
-    ctx.font = '60px Arial';
-    ctx.fillStyle = 'black';
-    ctx.fillText(`${days} : ${hours} : ${minutes} : ${seconds}`, 20, 70);
+    ctx.fillRect(0, 0, 400, 75);
 
     ctx.font = '20px Arial';
-    ctx.fillText('JOURS : HEURES : MINUTES : SECONDES', 25, 110);
+    ctx.fillStyle = 'black';
+    ctx.fillText(`${days} :`, 40, 30);
+    ctx.fillText(`${hours} :`, 140, 30);
+    ctx.fillText(`${minutes} :`, 240, 30);
+    ctx.fillText(seconds, 340, 30);
+
+    ctx.font = '10px Arial';
+    ctx.fillText('JOURS', 45, 50);
+    ctx.fillText('HEURES', 145, 50);
+    ctx.fillText('MINUTES', 245, 50);
+    ctx.fillText('SECONDES', 345, 50);
 
     // @ts-ignore
     encoder.addFrame(ctx);
@@ -53,12 +59,15 @@ fastify.get('/countdown', async (req, reply) => {
 });
 
 // Run the server!
-fastify.listen({ port: Number(process.env.PORT) || 3000 }, function (err, address) {
-  if (err) {
-    fastify.log.error(err);
-    process.exit(1);
-  }
+fastify.listen(
+  { port: Number(process.env.PORT) || 3000, host: '0.0.0.0' },
+  function (err, address) {
+    if (err) {
+      fastify.log.error(err);
+      process.exit(1);
+    }
 
-  // Server is now listening on ${address}
-  console.log(`Server is now listening on ${address}`);
-});
+    // Server is now listening on ${address}
+    console.log(`Server is now listening on ${address}`);
+  }
+);
