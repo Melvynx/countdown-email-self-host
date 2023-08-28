@@ -10,20 +10,29 @@ fastify.register(cors, {
   allowedHeaders: ['Content-Type', 'Authorization'],
 });
 
+const dateEndMapping: Record<string, Date> = {
+  beginjs: new Date('2023-09-19T23:59:00+02:00'),
+};
+
 fastify.get('/countdown', async (req, reply) => {
-  const encoder = new GIFEncoder(400, 75); // Dimensions augmentées
-  const canvas = createCanvas(400, 75);
+  const encoder = new GIFEncoder(400, 100); // Dimensions augmentées pour la hauteur
+  const canvas = createCanvas(400, 100);
   const ctx = canvas.getContext('2d');
+
+  // get query params dateEnd
+  const dateEnd = (req.query as Record<string, string>).type;
 
   encoder.start();
   encoder.setRepeat(0);
   encoder.setDelay(1000);
   encoder.setQuality(10);
 
-  reply.header('Content-Type', 'image/gif').send(encoder.createReadStream());
+  let endTime = dateEndMapping[dateEnd];
+  if (!endTime) {
+    return reply.code(400).send('Bad request');
+  }
 
-  let endTime = new Date();
-  endTime.setSeconds(endTime.getSeconds() + 60); // 60 secondes à partir de maintenant
+  reply.header('Content-Type', 'image/gif').send(encoder.createReadStream());
 
   for (let i = 0; i < 60; i++) {
     const simulatedTime = new Date(endTime.getTime() - i * 1000);
@@ -36,20 +45,26 @@ fastify.get('/countdown', async (req, reply) => {
     const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
 
     ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, 400, 75);
+    ctx.fillRect(0, 0, 400, 100);
 
-    ctx.font = '20px Arial';
+    ctx.font = '40px Arial';
     ctx.fillStyle = 'black';
-    ctx.fillText(`${days} :`, 40, 30);
-    ctx.fillText(`${hours} :`, 140, 30);
-    ctx.fillText(`${minutes} :`, 240, 30);
-    ctx.fillText(seconds, 340, 30);
+    ctx.textAlign = 'center';
 
-    ctx.font = '10px Arial';
-    ctx.fillText('JOURS', 45, 50);
-    ctx.fillText('HEURES', 145, 50);
-    ctx.fillText('MINUTES', 245, 50);
-    ctx.fillText('SECONDES', 345, 50);
+    // Positionnement précis avec 75 px pour chaque texte et 20 px pour les ':'
+    ctx.fillText(days, 40, 50);
+    ctx.fillText(':', 85, 50);
+    ctx.fillText(hours, 135, 50);
+    ctx.fillText(':', 180, 50);
+    ctx.fillText(minutes, 230, 50);
+    ctx.fillText(':', 280, 50);
+    ctx.fillText(seconds, 330, 50);
+
+    ctx.font = '16px Arial';
+    ctx.fillText('JOURS', 40, 80);
+    ctx.fillText('HEURES', 135, 80);
+    ctx.fillText('MINUTES', 230, 80);
+    ctx.fillText('SECONDES', 330, 80);
 
     // @ts-ignore
     encoder.addFrame(ctx);
