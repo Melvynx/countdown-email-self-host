@@ -15,17 +15,17 @@ const dateEndMapping: Record<string, Date> = {
 };
 
 fastify.get('/countdown', async (req, reply) => {
-  const encoder = new GIFEncoder(400, 100); // Dimensions augmentées pour la hauteur
-  const canvas = createCanvas(400, 100);
+  const encoder = new GIFEncoder(310, 84); // Dimensions augmentées pour la hauteur
+  const canvas = createCanvas(310, 84);
   const ctx = canvas.getContext('2d');
 
   // get query params dateEnd
   const dateEnd = (req.query as Record<string, string>).type;
 
   encoder.start();
-  encoder.setRepeat(0);
+  encoder.setRepeat(-1);
   encoder.setDelay(1000);
-  encoder.setQuality(10);
+  encoder.setQuality(2); // Une valeur plus petite signifie une qualité inférieure
 
   let endTime = dateEndMapping[dateEnd];
   if (!endTime) {
@@ -47,24 +47,27 @@ fastify.get('/countdown', async (req, reply) => {
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, 400, 100);
 
-    ctx.font = '40px Arial';
+    ctx.font = 'bold 50px Arial';
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
 
     // Positionnement précis avec 75 px pour chaque texte et 20 px pour les ':'
-    ctx.fillText(days, 40, 50);
-    ctx.fillText(':', 85, 50);
-    ctx.fillText(hours, 135, 50);
-    ctx.fillText(':', 180, 50);
-    ctx.fillText(minutes, 230, 50);
-    ctx.fillText(':', 280, 50);
-    ctx.fillText(seconds, 330, 50);
+    const textY = 40;
+    ctx.fillText(days, 32, textY);
+    ctx.fillText(':', 75, textY - 4);
+    ctx.fillText(hours, 115, textY);
+    ctx.fillText(':', 155, textY - 4);
+    ctx.fillText(minutes, 200, textY);
+    ctx.fillText(':', 240, textY - 4);
+    ctx.fillText(seconds, 280, textY);
 
-    ctx.font = '16px Arial';
-    ctx.fillText('JOURS', 40, 80);
-    ctx.fillText('HEURES', 135, 80);
-    ctx.fillText('MINUTES', 230, 80);
-    ctx.fillText('SECONDES', 330, 80);
+    const labelY = 70;
+
+    ctx.font = 'thin 14px Arial';
+    ctx.fillText('JOURS', 32, labelY);
+    ctx.fillText('HEURES', 115, labelY);
+    ctx.fillText('MIN', 200, labelY);
+    ctx.fillText('SEC', 280, labelY);
 
     // @ts-ignore
     encoder.addFrame(ctx);
