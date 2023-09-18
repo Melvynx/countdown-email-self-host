@@ -18,8 +18,8 @@ const dateEndMapping: Record<string, Date> = {
 };
 
 fastify.get('/countdown', async (req, reply) => {
-  const encoder = new GIFEncoder(310, 84); // Dimensions augmentées pour la hauteur
-  const canvas = createCanvas(310, 84);
+  const encoder = new GIFEncoder(315, 84); // Dimensions augmentées pour la hauteur
+  const canvas = createCanvas(315, 84);
   const ctx = canvas.getContext('2d');
 
   // get query params dateEnd
@@ -66,7 +66,7 @@ fastify.get('/countdown', async (req, reply) => {
 
     const labelY = 70;
 
-    ctx.font = 'thin 14px Arial';
+    ctx.font = 'regular 14px Inter';
     ctx.fillText('JOURS', 32, labelY);
     ctx.fillText('HEURES', 115, labelY);
     ctx.fillText('MIN', 200, labelY);
