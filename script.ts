@@ -1,7 +1,10 @@
 import cors from '@fastify/cors';
-import { createCanvas } from 'canvas';
+import { createCanvas, registerFont } from 'canvas';
 import Fastify from 'fastify';
 import GIFEncoder from 'gifencoder';
+
+registerFont('Inter-Regular.ttf', { family: 'Inter' });
+registerFont('Inter-Bold.ttf', { family: 'Inter', weight: 'bold' });
 
 const fastify = Fastify();
 fastify.register(cors, {
@@ -47,7 +50,7 @@ fastify.get('/countdown', async (req, reply) => {
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, 400, 100);
 
-    ctx.font = 'bold 50px Arial';
+    ctx.font = 'bold 50px Inter';
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
 
